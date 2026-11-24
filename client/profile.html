@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Connect - Profile</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <nav>
+    <a class="logo" href="index.html">Connect</a>
+    <div id="nav-links"></div>
+  </nav>
+
+  <div class="container">
+    <div id="profile-header"></div>
+
+        <div class="card hidden" id="edit-panel">
+      <h3>Edit profile</h3>
+      <p class="msg" id="msg"></p>
+
+      <label>Profile picture</label>
+      <div class="avatar-edit">
+        <span id="avatar-preview"></span>
+        <div>
+          <label class="btn btn-outline btn-sm" for="e-file">Choose photo</label>
+          <input type="file" id="e-file" accept="image/*" class="hidden" />
+          <button class="btn btn-danger btn-sm" type="button" onclick="removeAvatar()">Remove</button>
+          <p class="muted">JPG, PNG or WEBP. It is cropped to a square.</p>
+        </div>
+      </div>
+
+      <label for="e-username">Username</label>
+      <input type="text" id="e-username" />
+      <label for="e-bio">Bio (max 160 characters)</label>
+      <textarea id="e-bio" maxlength="160"></textarea>
+
+      <button class="btn" onclick="saveProfile()">Save</button>
+      <button class="btn btn-outline" onclick="toggleEdit()">Cancel</button>
+    </div>
+
+    <h3 class="section-title">Posts</h3>
+    <div id="profile-posts"></div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script src="js/postcard.js"></script>
+  <script src="js/profile.js"></script>
+</body>
+</html>

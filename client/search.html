@@ -1,0 +1,73 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChitChat - Discover People</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body class="auth-page">
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <a class="logo" href="index.html">
+      <span class="logo-icon">C</span>
+      ChitChat<span class="logo-dot">.</span>
+    </a>
+    <div id="nav-links"></div>
+  </nav>
+
+  <main class="search-container">
+
+    <!-- Search Welcome Banner -->
+    <section class="search-banner">
+      <div class="search-banner-content">
+        <span class="search-emoji">🌎</span>
+        <h1>Find Your People</h1>
+        <p>
+          Discover new friends, connect with people
+          and grow your ChitChat community.
+        </p>
+      </div>
+    </section>
+
+    <!-- Search Section -->
+    <section class="search-content">
+
+      <div class="search-heading">
+        <div>
+          <h2>Discover People</h2>
+          <p>Find someone you'd love to connect with.</p>
+        </div>
+        <span class="discover-icon">✨</span>
+      </div>
+
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          id="q"
+          placeholder="Search by username..."
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="search-hint">
+        <span>💡</span>
+        <p>Try searching for a username to find people.</p>
+      </div>
+
+      <!-- Search Results -->
+      <div id="results" class="search-results"></div>
+
+    </section>
+
+  </main>
+
+  <script src="js/app.js"></script>
+  <script src="js/search.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChitChat - Create Account</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="auth-page">
+
+  <nav class="navbar">
+    <a class="logo" href="index.html">
+      <span class="logo-icon">C</span>
+      ChitChat<span class="logo-dot">.</span>
+    </a>
+    <div id="nav-links"></div>
+  </nav>
+
+  <main class="auth-container">
+    <div class="auth-box card">
+
+      <div class="welcome-icon">💬</div>
+
+      <h1>Join ChitChat!</h1>
+      <p class="subtitle">
+        Your people. Your conversations. Your world.
+      </p>
+
+      <h2>Create your account</h2>
+      <p class="msg" id="msg"></p>
+
+      <form onsubmit="event.preventDefault(); register();">
+
+        <div class="input-group">
+          <label for="username">Username</label>
+          <input
+            type="text"
+            id="username"
+            placeholder="Choose a username"
+            autocomplete="username"
+            required
+          />
+          <small>3-20 letters, numbers or underscores</small>
+        </div>
+
+        <div class="input-group">
+          <label for="email">Email address</label>
+          <input
+            type="email"
+            id="email"
+            placeholder="Enter your email"
+            autocomplete="email"
+            required
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            placeholder="Create a password"
+            autocomplete="new-password"
+            required
+          />
+          <small>At least 6 characters</small>
+        </div>
+
+        <button class="btn btn-block" type="submit">
+          Create Account →
+        </button>
+
+      </form>
+
+      <p class="switch">
+        Already part of ChitChat?
+        <a href="login.html">Log in</a>
+      </p>
+
+      <div class="auth-footer">
+        By joining, you agree to be kind and respectful.
+      </div>
+
+    </div>
+  </main>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

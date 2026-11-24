@@ -41,7 +41,16 @@ router.put('/me', protect, async (req, res) => {
       user.username = username;
     }
     if (req.body.bio !== undefined) user.bio = String(req.body.bio).slice(0, 160);
-    if (req.body.avatarUrl !== undefined) user.avatarUrl = String(req.body.avatarUrl).trim();
+    if (req.body.avatarUrl !== undefined) {
+  const url = String(req.body.avatarUrl).trim();
+  const isUpload =
+    /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(url) && url.length <= 200000;
+  const isLink = /^https?:\/\//i.test(url);
+  if (url && !isUpload && !isLink) {
+    return res.status(400).json({ message: 'Invalid profile picture' });
+  }
+  user.avatarUrl = url;
+   }
 
     await user.save();
     res.json({
