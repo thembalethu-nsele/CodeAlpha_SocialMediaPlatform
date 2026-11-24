@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const postSchema = new mongoose.Schema(
   {
     author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    content: { type: String, required: true, trim: true, maxlength: 500 },
+    content: { type: String, trim: true, maxlength: 500, default: '' },
     imageUrl: { type: String, default: '' },
   },
   { timestamps: true }

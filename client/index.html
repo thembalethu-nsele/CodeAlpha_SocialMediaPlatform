@@ -21,10 +21,16 @@
         <span id="me-avatar"></span>
         <textarea id="content" maxlength="500" placeholder="What's on your mind?"></textarea>
       </div>
-      <input type="text" id="imageUrl" placeholder="Image URL (optional)" />
+
+      <div id="photo-preview" class="photo-preview hidden"></div>
       <p class="msg" id="msg"></p>
+
       <div class="composer-footer">
-        <span class="muted" id="counter">0 / 500</span>
+        <div class="composer-tools">
+          <label class="btn btn-outline btn-sm" for="photo">Add photo</label>
+          <input type="file" id="photo" accept="image/*" class="hidden" />
+          <span class="muted" id="counter">0 / 500</span>
+        </div>
         <button class="btn" onclick="createPost()">Post</button>
       </div>
     </div>

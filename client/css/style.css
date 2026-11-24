@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
 
-/* 1. COLOURS: change one here and the whole site changes */
+
 :root {
   --bg1: #fdf2f8;
   --bg2: #ede9fe;
@@ -234,3 +234,23 @@ label { display: block; font-size: 13px; font-weight: 700; color: var(--muted); 
 /* 16. PROFILE PICTURE PICKER */
 .avatar-edit { display: flex; gap: 16px; align-items: center; margin-bottom: 14px; }
 .avatar-edit .btn { margin-right: 6px; margin-bottom: 6px; }
+
+/* 17. POST PHOTO PICKER */
+.composer-tools { display: flex; align-items: center; gap: 12px; }
+.photo-preview { position: relative; margin-bottom: 12px; }
+.photo-preview img { width: 100%; max-height: 320px; object-fit: cover; border-radius: 16px; display: block; }
+.remove-photo {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(45, 42, 62, 0.75);
+  color: #fff;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+.remove-photo:hover { background: rgba(45, 42, 62, 0.95); }

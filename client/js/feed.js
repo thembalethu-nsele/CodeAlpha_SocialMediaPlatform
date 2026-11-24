@@ -1,109 +1,103 @@
-function postHtml(p) {
+let postImage = '';   // the chosen photo, shrunk and ready to send ('' means none)
+
+function showGreeting() {
   const me = getUser();
-  const author = p.author || { username: 'deleted', _id: '' };
-  const mine = me && String(author._id) === String(me.id);
-  const profileLink = 'profile.html?u=' + encodeURIComponent(author.username);
-
-  return `
-    <div class="card post" id="post-${p._id}" data-author="${author._id}">
-      <div class="post-head">
-        <a href="${profileLink}">${avatar(author)}</a>
-        <div class="post-meta">
-          <a class="uname" href="${profileLink}">@${esc(author.username)}</a>
-          <span class="muted">${timeAgo(p.createdAt)}</span>
-        </div>
-        ${mine ? `<button class="btn btn-danger btn-sm" onclick="deletePost('${p._id}')">Delete</button>` : ''}
-      </div>
-      <p class="post-text">${esc(p.content)}</p>
-      ${p.imageUrl ? `<img class="post-img" src="${esc(p.imageUrl)}" alt="" onerror="this.style.display='none'">` : ''}
-      <div class="post-actions">
-        <button class="act ${p.likedByMe ? 'liked' : ''}" id="like-${p._id}" onclick="toggleLike('${p._id}')">
-          ${p.likedByMe ? '♥' : '♡'} <span id="likes-${p._id}">${p.likeCount}</span>
-        </button>
-        <button class="act" onclick="toggleComments('${p._id}')">
-          💬 <span id="ccount-${p._id}">${p.commentCount}</span>
-        </button>
-      </div>
-      <div class="comments hidden" id="comments-${p._id}"></div>
-    </div>`;
+  if (!me) return;
+  document.getElementById('me-avatar').innerHTML = avatar(me);
+  document.getElementById('greeting').textContent = 'Hi, ' + me.username + '!';
 }
 
-async function toggleLike(id) {
-  const { ok, data } = await apiFetch(`/posts/${id}/like`, { method: 'POST' });
-  if (!ok) { showToast(data.message || 'Could not like'); return; }
-  const btn = document.getElementById('like-' + id);
-  btn.classList.toggle('liked', data.liked);
-  btn.innerHTML = `${data.liked ? '♥' : '♡'} <span id="likes-${id}">${data.likeCount}</span>`;
-  btn.classList.add('pop');
-  setTimeout(() => btn.classList.remove('pop'), 400);
-}
-
-async function deletePost(id) {
-  if (!confirm('Delete this post?')) return;
-  const { ok, data } = await apiFetch('/posts/' + id, { method: 'DELETE' });
-  if (!ok) { showToast(data.message || 'Could not delete'); return; }
-  document.getElementById('post-' + id).remove();
-  showToast('Post deleted');
-}
-
-async function toggleComments(id) {
-  const box = document.getElementById('comments-' + id);
-  if (!box.classList.contains('hidden')) { box.classList.add('hidden'); return; }
-  box.classList.remove('hidden');
-  await loadComments(id);
-}
-
-async function loadComments(id) {
-  const box = document.getElementById('comments-' + id);
-  const { ok, data } = await apiFetch(`/posts/${id}/comments`);
+async function loadFeed() {
+  const box = document.getElementById('feed');
+  const { ok, data } = await apiFetch('/posts/feed');
   if (!ok) { box.innerHTML = `<p class="msg">${esc(data.message)}</p>`; return; }
-
-  const me = getUser();
-  const postAuthor = document.getElementById('post-' + id).dataset.author;
-  const list = data.map((c) => {
-    const a = c.author || { username: 'deleted', _id: '' };
-    const canDelete = me && (String(a._id) === String(me.id) || postAuthor === String(me.id));
-    return `
-      <div class="comment">
-        ${avatar(a, 'avatar-sm')}
-        <div class="comment-body">
-          <a class="uname" href="profile.html?u=${encodeURIComponent(a.username)}">@${esc(a.username)}</a>
-          <span class="muted">${timeAgo(c.createdAt)}</span>
-          <p>${esc(c.text)}</p>
-        </div>
-        ${canDelete ? `<button class="link-btn" onclick="deleteComment('${c._id}', '${id}')">Delete</button>` : ''}
-      </div>`;
-  }).join('');
-
-  box.innerHTML = `
-    ${list || '<p class="muted" style="margin-bottom:10px">No comments yet. Be the first!</p>'}
-    <div class="comment-form">
-      <input type="text" id="cinput-${id}" maxlength="300" placeholder="Write a comment..."
-             onkeydown="if (event.key === 'Enter') addComment('${id}')" />
-      <button class="btn btn-sm" onclick="addComment('${id}')">Send</button>
-    </div>`;
+  box.innerHTML = data.length
+    ? data.map(postHtml).join('')
+    : '<div class="card empty">Your feed is empty. Write your first post, or <a href="search.html">search for people</a> to follow.</div>';
 }
 
-async function addComment(id) {
-  const input = document.getElementById('cinput-' + id);
-  const text = input.value.trim();
-  if (!text) return;
-  const { ok, data } = await apiFetch(`/posts/${id}/comments`, {
-    method: 'POST',
-    body: JSON.stringify({ text }),
+// ---------- Photo picker ----------
+// Shrinks the photo to at most 800 px wide and saves it as a JPEG
+function resizeImage(file, maxSide = 800) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Could not read the file'));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('That file is not a valid image'));
+      img.onload = () => {
+        const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL('image/jpeg', 0.8));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
   });
-  if (!ok) { showToast(data.message || 'Could not comment'); return; }
-  const counter = document.getElementById('ccount-' + id);
-  counter.textContent = Number(counter.textContent) + 1;
-  await loadComments(id);
-  document.getElementById('cinput-' + id).focus();
 }
 
-async function deleteComment(commentId, postId) {
-  if (!confirm('Delete this comment?')) return;
-  const { ok, data } = await apiFetch('/posts/comments/' + commentId, { method: 'DELETE' });
-  if (!ok) { showToast(data.message || 'Could not delete'); return; }
-  const counter = document.getElementById('ccount-' + postId);
-  counter.textContent = Math.max(0, Number(counter.textContent) - 1);
-  loadComments(postId);
+function showPhotoPreview() {
+  const box = document.getElementById('photo-preview');
+  if (!postImage) { box.classList.add('hidden'); box.innerHTML = ''; return; }
+  box.classList.remove('hidden');
+  box.innerHTML = `
+    <img src="${postImage}" alt="Preview" />
+    <button class="remove-photo" type="button" onclick="removePhoto()" title="Remove photo">&times;</button>`;
+}
+
+function removePhoto() {
+  postImage = '';
+  document.getElementById('photo').value = '';
+  showPhotoPreview();
+}
+
+async function onPhotoChosen(e) {
+  const file = e.target.files[0];
+  const msg = document.getElementById('msg');
+  msg.textContent = '';
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { msg.textContent = 'Please choose an image file'; return; }
+  try {
+    postImage = await resizeImage(file);
+    showPhotoPreview();
+  } catch (err) {
+    msg.textContent = err.message;
+  }
+}
+
+// ---------- Create a post ----------
+async function createPost() {
+  const msg = document.getElementById('msg');
+  const content = document.getElementById('content').value.trim();
+  msg.textContent = '';
+  if (!content && !postImage) { msg.textContent = 'Write something or add a photo first'; return; }
+
+  const { ok, data } = await apiFetch('/posts', {
+    method: 'POST',
+    body: JSON.stringify({ content, imageUrl: postImage }),
+  });
+  if (!ok) { msg.textContent = data.message || 'Could not post'; return; }
+
+  document.getElementById('content').value = '';
+  document.getElementById('counter').textContent = '0 / 500';
+  removePhoto();
+
+  const box = document.getElementById('feed');
+  if (box.querySelector('.empty')) box.innerHTML = '';
+  box.insertAdjacentHTML('afterbegin', postHtml(data));
+}
+
+if (requireLogin()) {
+  showGreeting();
+  document.getElementById('content').addEventListener('input', (e) => {
+    document.getElementById('counter').textContent = e.target.value.length + ' / 500';
+  });
+  document.getElementById('photo').addEventListener('change', onPhotoChosen);
+  loadFeed();
 }
